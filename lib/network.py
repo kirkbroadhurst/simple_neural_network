@@ -25,3 +25,31 @@ def build_synapses(layers):
         # the synapse is of height n+1 because n inputs plus 1 for bias/constant
         synapses += [2 * np.random.random((n + 1, m)) - 1]
     return synapses
+
+
+def forward_propagate(input_data, synapses):
+    """
+    Push
+    :param input_data:
+    :param synapses:
+    :return:
+    """
+    pass
+
+
+def sigmoid(x):
+    """
+    Get the value of the sigmoid function at x
+    :param x: Scalar, matrix, array etc of real values
+    :return: The value of the sigmoid function at point(s) x
+    """
+    return 1/(1+np.exp(-x))
+
+
+def sigmoid_second_derivative(x):
+    """
+    Get the slope of the sigmoid function at x
+    :param x: Scalar, matrix, array etc of real values
+    :return: The slope of the sigmoid function at point(s) x
+    """
+    return sigmoid(x)*(1-sigmoid(x))

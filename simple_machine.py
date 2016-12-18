@@ -1,4 +1,5 @@
 import numpy as np
+from lib.network import build_synapses
 
 
 class SimpleMachine(object):
@@ -14,7 +15,7 @@ class SimpleMachine(object):
         self.result = result
         self.layers = layers
         self.z = []
-        self.synapse = self.__construct_synapses()
+        self.synapse = build_synapses(layers)
 
     @property
     def size(self):
@@ -26,20 +27,6 @@ class SimpleMachine(object):
             return x*(1-x)
         return 1/(1+np.exp(-x))
 
-    def __construct_synapses(self):
-        """
-        Constructs a set of randomly initiated synapses corresponding to the number / size of hidden layers
-        :return: Array of matrixes for the synapses
-        """
-        s = []
-        for l in range(len(self.layers)):
-            # for the first layer, the input size is the number of features in training data
-            n = self.training_data.shape[1] if l == 0 else self.layers[l-1]
-            m = self.layers[l]
-
-            # add a random mean-centered synapse of size; 2 * random(0,1) - 1
-            s += [2*np.random.random((n+1, m))-1]
-        return s
 
     def __forward_propagate(self):
         """
