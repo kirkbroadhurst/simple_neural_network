@@ -1,5 +1,5 @@
 import numpy as np
-from lib.network import build_synapses, forward_propagate, delta, cost
+from lib.network import build_synapses, forward_propagate, delta, cost, a
 
 
 class SimpleMachine(object):
@@ -15,10 +15,19 @@ class SimpleMachine(object):
         self.Y = result
         self.layers = layers
         self.theta = build_synapses(layers)
+        self.l = 0.01
 
     @property
     def size(self):
         return len(self.theta)
+
+    @property
+    def m(self):
+        """
+        Number of rows in the training data
+        :return:
+        """
+        return self.training_data.shape[0]
 
     def score(self, data):
         """
@@ -26,7 +35,7 @@ class SimpleMachine(object):
         :param data:
         :return:
         """
-        return forward_propagate(data, self.theta)
+        return forward_propagate(data, self.theta)[-1]
 
     def train(self, iterations=10000):
         """
@@ -38,32 +47,38 @@ class SimpleMachine(object):
         np.random.seed(1)
 
         for i in range(iterations):
-            layers = forward_propagate(self.training_data, self.theta)
+            test = i % self.m
+            x = self.training_data[test]
+            y = self.Y[test]
 
-            ######
+            g = forward_propagate(x, self.theta)
             # backward propagate deltas
-            ######
-            
+
             # we need an error matrix for each layer
-            errors = [None] * len(layers)
+            errors = [None] * len(g)
 
             # set the last error value to the actual values minus the last layer
-            errors[-1] = self.Y - layers[-1]
+            errors[-1] = y - g[-1]
 
             # reverse iterate through layers, adjusting synapse according to error
-            for t in range(len(self.theta) - 1, -1, -1):
-                error = delta(self.theta[t], errors[t+1], layers[t])
-                self.theta[t] -= error
-                errors[t] = error
+            for th in range(len(self.theta) - 1, -1, -1):
+                error = delta(self.theta[th], errors[th+1], g[th])
+                self.theta[th] -= error
+                errors[th] = error
 
-            print 'cost', cost(layers[-1], self.Y)
+            big_delta = sum([(a(g[e])*errors[e])[0, 0] for e in range(len(errors) - 1)])
+            print big_delta
 
-        print layers[-1]
+            d0 = 1.0 / self.m * big_delta
+            d = [np.matrix(1.0 / self.m * (big_delta + (self.l * th))) for th in self.theta]
+            self.theta = [th + d[ix] for ix, th in enumerate(self.theta)]
+            print 'big delta', big_delta
+            print 'cost', cost(self.score(self.training_data), self.Y)
 
 
 if __name__ == "__main__":
-    t = np.matrix(((1, 1, 1, 1), (2, 2, 2, 2), (3, 3, 3, 3)))
-    l = [4, 2]
-    r = np.matrix(((1, 0), (0, 1), (1, 0)))
+    t = np.matrix(((1.0, 0, 0, 0.99), (0, 0.8, 0, 0.95), (0, 0, 0.9, 0.9)))
+    l = [4, 3]
+    r = np.matrix(((1, 0, 0), (0, 1, 0), (0, 0, 1)))
     s = SimpleMachine(t, r, l)
-    s.train(5)
+    s.train(100)

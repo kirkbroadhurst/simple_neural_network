@@ -17,9 +17,10 @@ def test_single_synapse():
 
     assert shape == (4, 4)
 
+    print output[1]
     # values are all between 0.997527 and 0.997528
-    assert (np.zeros(shape) < (output[1] - 0.997527)).all()
-    assert (np.zeros(shape) > (output[1] - 0.997528)).all()
+    assert (np.zeros(shape) < (output[1] - 0.9990889)).all()
+    assert (np.zeros(shape) > (output[1] - 0.9990890)).all()
 
 
 def test_three_synapse():

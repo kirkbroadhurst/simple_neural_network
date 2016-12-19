@@ -32,18 +32,34 @@ def forward_propagate(initial_layer, thetas):
     Push input data through the neural network
     :param initial_layer: Initial layer of data (raw features)
     :param thetas: Set of thetas to act in synapses
-    :return: Constructed neural network of
+    :return: Array of input matrices and output matrices
     """
 
+    #TODO remove this a stuff
     data = [initial_layer]
+    #a_ = []
 
     # for each synapse, push through in_data and get out_data
     for i in range(len(thetas)):
         x = data[i]
         theta = thetas[i]
-        out_data = g(z(x, theta))
-        data.append(np.matrix(out_data))
+        #a_.append(a(x))
+        output = g(z(x, theta))
+        data.append(np.matrix(output))
     return data
+
+
+def a(x):
+    """
+    Compute the a value for x with additional bias input
+    :param x: the input value for a matrix computation
+    :return: X with appended column of 1s for bias
+    """
+    # add extra column for bias/constant term
+    a_ = np.matrix(np.empty((x.shape[0], x.shape[1] + 1)))
+    a_[:, -1] = 1
+    a_[:, :-1] = x
+    return a_
 
 
 def z(x, theta):
@@ -53,11 +69,7 @@ def z(x, theta):
     :param theta: The theta value for this synapse
     :return: x*theta including the bias term
     """
-    # add extra column for bias/constant term
-    in_data = np.empty((x.shape[0], x.shape[1] + 1))
-    in_data[:, -1] = 1
-    in_data[:, :-1] = x
-    return in_data.dot(theta)
+    return a(x).dot(theta)
 
 
 def g(x):
@@ -96,8 +108,12 @@ def delta(theta, output_error, activation):
     :param activation: The activation for this layer
     :return: delta for the hidden layer
     """
-    slope = g_prime(z(activation, theta))
-    return theta.dot(output_error.T)*slope
+
+    # construct the activation matrix with an addition bias term
+    a_ = a(activation)
+    slope = np.multiply(a_, 1 - a_)
+    result = np.multiply(theta.dot(output_error.T), slope.T)
+    return result
 
 
 def cost(output, expected):
@@ -110,7 +126,8 @@ def cost(output, expected):
     gap = error(output, expected)
     n = expected.shape[0]
     p = np.multiply(gap, gap)
-    return 1.0/(2*n)*sum(sum(p).T)[0]
+    c = 1.0/(2*n)*sum(sum(p).T)
+    return c[0, 0]
 
 
 
