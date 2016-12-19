@@ -27,17 +27,40 @@ def build_synapses(layers):
     return synapses
 
 
-def forward_propagate(input_data, synapses):
+def forward_propagate(initial_layer, thetas):
     """
-    Push
-    :param input_data:
-    :param synapses:
-    :return:
+    Push input data through the neural network
+    :param initial_layer: Initial layer of data (raw features)
+    :param thetas: Set of thetas to act in synapses
+    :return: Constructed neural network of
     """
-    pass
+
+    data = [initial_layer]
+
+    # for each synapse, push through in_data and get out_data
+    for i in range(len(thetas)):
+        x = data[i]
+        theta = thetas[i]
+        out_data = g(z(x, theta))
+        data.append(np.matrix(out_data))
+    return data
 
 
-def sigmoid(x):
+def z(x, theta):
+    """
+    Compute the z value of x*theta; append the bias term
+    :param x: The input data to this synapse
+    :param theta: The theta value for this synapse
+    :return: x*theta including the bias term
+    """
+    # add extra column for bias/constant term
+    in_data = np.empty((x.shape[0], x.shape[1] + 1))
+    in_data[:, -1] = 1
+    in_data[:, :-1] = x
+    return in_data.dot(theta)
+
+
+def g(x):
     """
     Get the value of the sigmoid function at x
     :param x: Scalar, matrix, array etc of real values
@@ -46,10 +69,49 @@ def sigmoid(x):
     return 1/(1+np.exp(-x))
 
 
-def sigmoid_second_derivative(x):
+def g_prime(x):
     """
-    Get the slope of the sigmoid function at x
+    Get the derivative of the sigmoid function at x
     :param x: Scalar, matrix, array etc of real values
-    :return: The slope of the sigmoid function at point(s) x
+    :return: The derivative of the sigmoid function at point(s) x
     """
-    return sigmoid(x)*(1-sigmoid(x))
+    return x*(1-x)
+
+
+def error(output, expected):
+    """
+    Get the error at a particular layer
+    :param output: The output of the layer
+    :param expected: The expect value for that layer
+    :return:
+    """
+    return output - expected
+
+
+def delta(theta, output_error, activation):
+    """
+    Get the error for a hidden layer (no explict labels)
+    :param theta: The synapse to which this layer is an input
+    :param output_error: The upstream error, backed out with the synapse
+    :param activation: The activation for this layer
+    :return: delta for the hidden layer
+    """
+    slope = g_prime(z(activation, theta))
+    return theta.dot(output_error.T)*slope
+
+
+def cost(output, expected):
+    """
+    Compute the cost of a neural network vs the expect / label output
+    :param output: The output of the final layer of a neural network
+    :param expected: The expected value for that layer
+    :return: Cost of the network
+    """
+    gap = error(output, expected)
+    n = expected.shape[0]
+    p = np.multiply(gap, gap)
+    return 1.0/(2*n)*sum(sum(p).T)[0]
+
+
+
+
