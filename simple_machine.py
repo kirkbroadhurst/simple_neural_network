@@ -1,5 +1,5 @@
 import numpy as np
-from lib.network import build_synapses
+from lib.network import build_synapses, forward_propagate, delta, cost
 
 
 class SimpleMachine(object):
@@ -12,68 +12,58 @@ class SimpleMachine(object):
         :param layers: an array where each value indicates the size of a hidden layer
         """
         self.training_data = training_data        
-        self.result = result
+        self.Y = result
         self.layers = layers
-        self.z = []
-        self.synapse = build_synapses(layers)
+        self.theta = build_synapses(layers)
 
     @property
     def size(self):
-        return len(self.synapse)
-
-    def nonlin(self, x, deriv=False):
-        # sigmoid function
-        if(deriv):
-            return x*(1-x)
-        return 1/(1+np.exp(-x))
-
-
-    def __forward_propagate(self):
-        """
-        propagate through layers, applying synapses
-        """
-        self.z = []
-        data = [self.training_data]
-        for l in self.layers:
-
-            layers += [self.nonlin(layers[i].dot(self.synapse[i]))]
-        return layers
+        return len(self.theta)
 
     def score(self, data):
-        return self.__forward_propagate(data)[-1]
-    
-    
-    def train(self, iterations=10000):
-        self.iterations = iterations
-        self.__construct_synapse();
-        np.random.seed(1)        
+        """
+        Score the input data against the synapses / machine
+        :param data:
+        :return:
+        """
+        return forward_propagate(data, self.theta)
 
-        for i in range(self.iterations):
-            layers = self.__forward_propagate(training_input)
+    def train(self, iterations=10000):
+        """
+        Train a machine
+        :param iterations:
+        :return:
+        """
+
+        np.random.seed(1)
+
+        for i in range(iterations):
+            layers = forward_propagate(self.training_data, self.theta)
 
             ######
             # backward propagate deltas
             ######
             
-            # we need an error matrix for each synapse
-            errors = [None] * self.size
+            # we need an error matrix for each layer
+            errors = [None] * len(layers)
 
             # set the last error value to the actual values minus the last layer
-            errors[-1] = training_actual-layers[-1]
+            errors[-1] = self.Y - layers[-1]
 
             # reverse iterate through layers, adjusting synapse according to error
-            for i in range(self.size,0,-1):
-                adjustment_vector = self.nonlin(layers[i], True) * errors[i-1]
-                self.synapse[i-1] += layers[i-1].T.dot(adjustment_vector)
-                errors[i-2] = adjustment_vector.dot(self.synapse[i-1].T)
+            for t in range(len(self.theta) - 1, -1, -1):
+                error = delta(self.theta[t], errors[t+1], layers[t])
+                self.theta[t] -= error
+                errors[t] = error
 
-            if i%1000==0:
-                print errors[-1]
+            print 'cost', cost(layers[-1], self.Y)
 
         print layers[-1]
 
+
 if __name__ == "__main__":
     t = np.matrix(((1, 1, 1, 1), (2, 2, 2, 2), (3, 3, 3, 3)))
-    l = [3, 2]
-    r = np.matrix(((1), (2), (3)))
+    l = [4, 2]
+    r = np.matrix(((1, 0), (0, 1), (1, 0)))
     s = SimpleMachine(t, r, l)
+    s.train(5)
