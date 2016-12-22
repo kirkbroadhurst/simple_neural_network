@@ -51,7 +51,7 @@ class SimpleMachine(object):
             x = self.training_data[test]
             y = self.Y[test]
 
-            g = forward_propagate(x, self.theta)
+            (g, z_) = forward_propagate(x, self.theta)
             # backward propagate deltas
 
             # we need an error matrix for each layer

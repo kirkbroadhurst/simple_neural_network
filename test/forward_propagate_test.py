@@ -9,18 +9,21 @@ def test_single_synapse():
     """
     input_data = np.ones((4, 6))
     synapses = [np.ones((7, 4))]
-    output = forward_propagate(input_data, synapses)
+    (a, z) = forward_propagate(input_data, synapses)
 
-    assert len(output) == 2
-    assert (output[0] == input_data).all()
-    shape = output[1].shape
+    assert len(a) == 2
+    assert (a[0] == input_data).all()
+    shape = a[1].shape
 
     assert shape == (4, 4)
 
-    print output[1]
+    print a[1]
     # values are all between 0.997527 and 0.997528
-    assert (np.zeros(shape) < (output[1] - 0.9990889)).all()
-    assert (np.zeros(shape) > (output[1] - 0.9990890)).all()
+    assert (np.zeros(shape) < (a[1] - 0.9990889)).all()
+    assert (np.zeros(shape) > (a[1] - 0.9990890)).all()
+
+    assert len(z) == 1
+    assert z[0].shape == a[1].shape
 
 
 def test_three_synapse():
@@ -30,23 +33,28 @@ def test_three_synapse():
     """
     input_data = np.ones((4, 100))
     synapses = [np.ones((101, 50)), np.ones((51, 20)), np.ones((21, 5))]
-    output = forward_propagate(input_data, synapses)
+    (a, z) = forward_propagate(input_data, synapses)
 
-    assert len(output) == 4
-    assert (output[0] == input_data).all()
+    assert len(a) == 4
+    assert (a[0] == input_data).all()
 
-    shape = output[1].shape
+    shape = a[1].shape
     assert shape == (4, 50)
-    assert (np.zeros(shape) < (output[1] - 0.99999999)).all()
-    assert (np.zeros(shape) > (output[1] - 1.00000001)).all()
+    assert (np.zeros(shape) < (a[1] - 0.99999999)).all()
+    assert (np.zeros(shape) > (a[1] - 1.00000001)).all()
 
-    print output[2]
-    shape = output[2].shape
+    print a[2]
+    shape = a[2].shape
     assert shape == (4, 20)
-    assert (np.zeros(shape) < (output[2] - 0.99999999)).all()
-    assert (np.zeros(shape) > (output[2] - 1.00000001)).all()
+    assert (np.zeros(shape) < (a[2] - 0.99999999)).all()
+    assert (np.zeros(shape) > (a[2] - 1.00000001)).all()
 
-    shape = output[3].shape
+    shape = a[3].shape
     assert shape == (4, 5)
-    assert (np.zeros(shape) < (output[3] - 0.99999999)).all()
-    assert (np.zeros(shape) > (output[3] - 1.00000001)).all()
+    assert (np.zeros(shape) < (a[3] - 0.99999999)).all()
+    assert (np.zeros(shape) > (a[3] - 1.00000001)).all()
+
+    assert len(z) == 3
+    assert z[0].shape == a[1].shape
+    assert z[1].shape == a[2].shape
+    assert z[2].shape == a[3].shape

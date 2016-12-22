@@ -32,18 +32,22 @@ def forward_propagate(initial_layer, thetas):
     Push input data through the neural network
     :param initial_layer: Initial layer of data (raw features)
     :param thetas: Set of thetas to act in synapses
-    :return: Array of input matrices and output matrices
+    :return: Tuple of a and z matrices;
+         a_(n+1) = sigmoid(z_n)
+         z_n = a_n * theta_n
     """
 
-    data = [initial_layer]
+    a_ = [initial_layer]
+    z_ = []
 
     # for each synapse, push through in_data and get out_data
     for i in range(len(thetas)):
-        x = data[i]
+        x = a_[i]
         theta = thetas[i]
-        output = g(z(x, theta))
-        data.append(np.matrix(output))
-    return data
+        z_.append(z(x, theta))
+        output = g(z_[-1])
+        a_.append(np.matrix(output))
+    return a_, z_
 
 
 def a(x):
@@ -135,5 +139,26 @@ def cost(estimated, y, thetas=[], l=0):
     return j
 
 
+def theta_prime(a, z, theta, y):
+    """
+    Compute the gradient for the theta terms with respect to the cost
+    :param a: Array of input / post-sigmoid matrices : a_(n+1) = sigmoid(z_n)
+    :param z: Array of interim matrices : z_n = a_n * theta_n
+    :param theta: Array of coefficient matrices
+    :param y: Expected output, i.e. labels
+    :return:
+    """
 
+    # hard coding to the number of layers, for simplicity
+    a1 = a[0]
+    a2 = a[1]
+    a3 = a[2]
 
+    theta1 = theta[0]
+    theta2 = theta[1]
+
+    z1 = z[0]
+    z2 = z[1]
+
+    d3 = a3 - y
+    d2 = theta2[:, 2:]
