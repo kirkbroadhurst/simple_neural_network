@@ -1,4 +1,5 @@
 import numpy as np
+from math import log
 
 
 def build_synapses(layers):
@@ -116,18 +117,36 @@ def delta(theta, output_error, activation):
     return result
 
 
-def cost(output, expected):
+def cost(estimated, y, thetas=[], l=0):
     """
     Compute the cost of a neural network vs the expect / label output
-    :param output: The output of the final layer of a neural network
-    :param expected: The expected value for that layer
+    :param estimated: The output of the final layer of a neural network - the estimation
+    :param y: The expected value for output of the neural network - the label
+    :param thetas: Coefficients used in neural network (regularization)
+    :param l: lambda value - regularization parameter
     :return: Cost of the network
     """
-    gap = error(output, expected)
-    n = expected.shape[0]
-    p = np.multiply(gap, gap)
-    c = 1.0/(2*n)*sum(sum(p).T)
-    return c[0, 0]
+
+    # the number of observations
+    m = y.shape[0]
+
+    # take log of the estimated value so that the 'cost' of predicting 1 is 0, and the 'cost' of predicting zero -> inf
+    # multiply by y, i.e. when y = 1 we should have estimated 1; an estimate closer to zero is high cost i.e. log(0)
+    # -y * log(estimated)
+
+    # the reverse applies for y = 0; we want 'high cost' when y = 0 and estimation -> 1; so use log(1 - est) -> inf.
+    # and multiply by 1 - y, i.e. 1 when y == 0
+
+    gap = np.multiply(-y, np.log(estimated)) - np.multiply(1-y, np.log(1-estimated))
+    j = 1.0 / m * np.sum(gap)
+
+    # if thetas are supplied for regularization, return sum of squares
+    for t in thetas:
+        # remove the bias / constant term
+        t_ = t[:, 1:]
+        j += l/(2.0*m) * np.sum(np.multiply(t_, t_))
+
+    return j
 
 
 
