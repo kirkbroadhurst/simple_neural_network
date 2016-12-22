@@ -27,17 +27,17 @@ def build_synapses(layers):
     return synapses
 
 
-def forward_propagate(initial_layer, thetas):
+def forward_propagate(a1, thetas):
     """
     Push input data through the neural network
-    :param initial_layer: Initial layer of data (raw features)
+    :param a1: Initial layer of data (raw features)
     :param thetas: Set of thetas to act in synapses
     :return: Tuple of a and z matrices;
          a_(n+1) = sigmoid(z_n)
          z_n = a_n * theta_n
     """
 
-    a_ = [initial_layer]
+    a_ = [a1]
     z_ = []
 
     # for each synapse, push through in_data and get out_data
@@ -88,7 +88,7 @@ def g_prime(x):
     :param x: Scalar, matrix, array etc of real values
     :return: The derivative of the sigmoid function at point(s) x
     """
-    return g(x)*(1-g(x))
+    return np.multiply(g(x), (1-g(x)))
 
 
 def delta(theta, output_error, activation):
@@ -149,6 +149,8 @@ def theta_prime(a, z, theta, y):
     :return:
     """
 
+    m = y.shape[0]
+
     # hard coding to the number of layers, for simplicity
     a1 = a[0]
     a2 = a[1]
@@ -157,8 +159,16 @@ def theta_prime(a, z, theta, y):
     theta1 = theta[0]
     theta2 = theta[1]
 
-    z1 = z[0]
-    z2 = z[1]
+    z2 = z[0]
+    z3 = z[1]
 
     d3 = a3 - y
-    d2 = theta2[:, 2:]
+    d2 = np.multiply((d3 * theta2[:, 1:]), g_prime(z2))
+
+    delta1 = d2.T*a1
+    delta2 = d3.T*a2
+
+    theta1_prime = delta1 / m
+    theta2_prime = delta2 / m
+
+    return [theta1_prime, theta2_prime]

@@ -1,19 +1,5 @@
-import csv
-import numpy as np
 from lib.network import cost
-
-
-def load_csv(file_name):
-    """
-    Load a csv file into a numpy matrix of floats
-    :param file_name: file name
-    :return:
-    """
-    with open(file_name, 'r') as f:
-        data_iter = csv.reader(f, delimiter=',')
-        data = [data for data in data_iter]
-    matrix = np.matrix(data, dtype=float)
-    return matrix
+from data import load_csv
 
 
 def test_cost():
@@ -22,7 +8,7 @@ def test_cost():
     :return:
     """
     y = load_csv('data/y.csv')
-    est = load_csv('data/est.csv')
+    est = load_csv('data/a3.csv')
     j = cost(est, y)
 
     # cost should be 0.287629
@@ -35,10 +21,10 @@ def test_cost_regularized():
     :return:
     """
     y = load_csv('data/y.csv')
-    est = load_csv('data/est.csv')
+    a3 = load_csv('data/a3.csv')
     theta1 = load_csv('data/theta1.csv')
     theta2 = load_csv('data/theta2.csv')
-    j = cost(est, y, [theta1, theta2], 1)
+    j = cost(a3, y, [theta1, theta2], 1)
 
     # cost should be 0.383770
     assert 0.383769 < j < 0.383771
