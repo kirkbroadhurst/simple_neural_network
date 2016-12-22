@@ -1,5 +1,4 @@
 import numpy as np
-from math import log
 
 
 def build_synapses(layers):
@@ -36,15 +35,12 @@ def forward_propagate(initial_layer, thetas):
     :return: Array of input matrices and output matrices
     """
 
-    #TODO remove this a stuff
     data = [initial_layer]
-    #a_ = []
 
     # for each synapse, push through in_data and get out_data
     for i in range(len(thetas)):
         x = data[i]
         theta = thetas[i]
-        #a_.append(a(x))
         output = g(z(x, theta))
         data.append(np.matrix(output))
     return data
