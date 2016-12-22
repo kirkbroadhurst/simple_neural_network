@@ -84,17 +84,7 @@ def g_prime(x):
     :param x: Scalar, matrix, array etc of real values
     :return: The derivative of the sigmoid function at point(s) x
     """
-    return x*(1-x)
-
-
-def error(output, expected):
-    """
-    Get the error at a particular layer
-    :param output: The output of the layer
-    :param expected: The expect value for that layer
-    :return:
-    """
-    return output - expected
+    return g(x)*(1-g(x))
 
 
 def delta(theta, output_error, activation):
