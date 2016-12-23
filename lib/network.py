@@ -37,7 +37,7 @@ def forward_propagate(a1, thetas):
          z_n = a_n * theta_n
     """
 
-    a_ = [a1]
+    a_ = [a(a1)]
     z_ = []
 
     # for each synapse, push through in_data and get out_data
@@ -46,7 +46,9 @@ def forward_propagate(a1, thetas):
         theta = thetas[i]
         z_.append(z(x, theta))
         output = g(z_[-1])
-        a_.append(np.matrix(output))
+        a_.append(a(output))
+    # the last a value shouldn't have bias term - it's the network output. Truncate the bias column
+    a_[-1] = a_[-1][:, 1:]
     return a_, z_
 
 
@@ -58,19 +60,19 @@ def a(x):
     """
     # add extra column for bias/constant term
     a_ = np.matrix(np.empty((x.shape[0], x.shape[1] + 1)))
-    a_[:, -1] = 1
-    a_[:, :-1] = x
+    a_[:, 0] = 1
+    a_[:, 1:] = x
     return a_
 
 
-def z(x, theta):
+def z(a_, theta):
     """
-    Compute the z value of x*theta; append the bias term
-    :param x: The input data to this synapse
+    Compute the z value of a*theta; does not append the bias term
+    :param a_: The input data to this synapse
     :param theta: The theta value for this synapse
-    :return: x*theta including the bias term
+    :return: a*theta
     """
-    return a(x).dot(theta)
+    return a_.dot(theta)
 
 
 def g(x):
@@ -151,24 +153,33 @@ def theta_prime(a, z, theta, y):
 
     m = y.shape[0]
 
-    # hard coding to the number of layers, for simplicity
-    a1 = a[0]
-    a2 = a[1]
-    a3 = a[2]
+    # the last a value is the network output
+    out = a[-1]
 
-    theta1 = theta[0]
-    theta2 = theta[1]
+    # compute d values
+    # the first computed d value is the network output - y
+    d = [out - y]
+    i = len(theta) - 1
+    while len(d) < len(theta):
+        # d value that is currently first is the last layer we 'backpropagated'
+        d_ = d[0]
+        t_ = theta[i]
+        i -= 1
 
-    z2 = z[0]
-    z3 = z[1]
+        # theta[i] corresponds to z[i-1] - there is no theta[L] and there is no z[0]
+        z_ = z[i]
 
-    d3 = a3 - y
-    d2 = np.multiply((d3 * theta2[:, 1:]), g_prime(z2))
+        # compute the d value for this layer
+        new_value = np.multiply((d_ * t_[:, 1:]), g_prime(z_))
+        d.insert(0, new_value)
 
-    delta1 = d2.T*a1
-    delta2 = d3.T*a2
+    big_delta = []
+    theta_p = []
+    # compute big delta value & theta_prime values
+    for (ix, d_) in enumerate(d):
+        # the 'first' d value is d2; multiply it by the first a value a1 - and so on
+        big_delta.append(d_.T * a[ix])
+        theta_p.append(big_delta[-1] / m)
 
-    theta1_prime = delta1 / m
-    theta2_prime = delta2 / m
+    return theta_p
 
-    return [theta1_prime, theta2_prime]

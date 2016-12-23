@@ -1,5 +1,5 @@
 import numpy as np
-from lib.network import build_synapses, forward_propagate, delta, cost, a
+from lib.network import build_synapses, forward_propagate, delta, cost, a, theta_prime
 
 
 class SimpleMachine(object):
@@ -47,13 +47,32 @@ class SimpleMachine(object):
         np.random.seed(1)
 
         for i in range(iterations):
+            (a_0, z_0) = forward_propagate(self.training_data, self.theta)
+            print 'cost', cost(a_0[-1], self.Y)
+
             test = i % self.m
             x = self.training_data[test]
             y = self.Y[test]
 
-            (g, z_) = forward_propagate(x, self.theta)
-            # backward propagate deltas
+            (a_, z_) = forward_propagate(x, self.theta)
 
+            gradients = theta_prime(a_, z_, self.theta, y)
+
+            for (ix, g) in enumerate(gradients):
+                self.theta[ix] -= self.l * g.T
+
+        (a_final, z_final) = forward_propagate(self.training_data, self.theta)
+        print 'cost', cost(a_final[-1], self.Y)
+
+
+if __name__ == "__main__":
+    t = np.matrix(((1.0, 0, 0, 0.99), (0, 0.8, 0, 0.95), (0, 0, 0.9, 0.9)))
+    l = [4, 3]
+    r = np.matrix(((1, 0, 0), (0, 1, 0), (0, 0, 1)))
+    s = SimpleMachine(t, r, l)
+    s.train(100)
+
+'''
             # we need an error matrix for each layer
             errors = [None] * len(g)
 
@@ -72,13 +91,4 @@ class SimpleMachine(object):
             d0 = 1.0 / self.m * big_delta
             d = [np.matrix(1.0 / self.m * (big_delta + (self.l * th))) for th in self.theta]
             self.theta = [th + d[ix] for ix, th in enumerate(self.theta)]
-            print 'big delta', big_delta
-            print 'cost', cost(self.score(self.training_data), self.Y)
-
-
-if __name__ == "__main__":
-    t = np.matrix(((1.0, 0, 0, 0.99), (0, 0.8, 0, 0.95), (0, 0, 0.9, 0.9)))
-    l = [4, 3]
-    r = np.matrix(((1, 0, 0), (0, 1, 0), (0, 0, 1)))
-    s = SimpleMachine(t, r, l)
-    s.train(100)
+'''
