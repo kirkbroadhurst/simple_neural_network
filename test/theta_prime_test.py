@@ -20,9 +20,29 @@ def test_theta_prime():
     y = load_csv('data/y.csv')
 
     result = theta_prime([a1, a2, a3], [z2, z3], [theta1, theta2], y)
-    # this fails to assert true for some reason - TODO figure it out
-    #assert np.allclose(result[0], theta1_grad)
-    #assert np.allclose(result[1], theta2_grad)
+    assert np.allclose(result[0], theta1_grad)
+    assert np.allclose(result[1], theta2_grad)
+
+
+def test_theta_prime_regularization():
+    a1 = load_csv('data/a1.csv')
+    a2 = load_csv('data/a2.csv')
+    a3 = load_csv('data/a3.csv')
+
+    z2 = load_csv('data/z2.csv')
+    z3 = load_csv('data/z3.csv')
+
+    theta1 = load_csv('data/theta1.csv')
+    theta2 = load_csv('data/theta2.csv')
+
+    theta1_grad_reg = load_csv('data/theta1_grad_reg.csv')
+    theta2_grad_reg = load_csv('data/theta2_grad_reg.csv')
+
+    y = load_csv('data/y.csv')
+
+    result = theta_prime([a1, a2, a3], [z2, z3], [theta1, theta2], y, 1)
+    assert np.allclose(result[0], theta1_grad_reg)
+    assert np.allclose(result[1], theta2_grad_reg)
 
 
 def test_generic_vs_static():
@@ -83,3 +103,4 @@ def fixed_theta_prime(a, z, theta, y):
 if __name__ == "__main__":
     test_generic_vs_static()
     test_theta_prime()
+    test_theta_prime_regularization()

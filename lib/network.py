@@ -141,13 +141,14 @@ def cost(estimated, y, thetas=[], l=0):
     return j
 
 
-def theta_prime(a, z, theta, y):
+def theta_prime(a, z, theta, y, l = 0):
     """
     Compute the gradient for the theta terms with respect to the cost
     :param a: Array of input / post-sigmoid matrices : a_(n+1) = sigmoid(z_n)
     :param z: Array of interim matrices : z_n = a_n * theta_n
     :param theta: Array of coefficient matrices
     :param y: Expected output, i.e. labels
+    :param l: lambda value to adjust regularization effect
     :return:
     """
 
@@ -179,7 +180,8 @@ def theta_prime(a, z, theta, y):
     for (ix, d_) in enumerate(d):
         # the 'first' d value is d2; multiply it by the first a value a1 - and so on
         big_delta.append(d_.T * a[ix])
-        theta_p.append(big_delta[-1] / m)
+        regularization_term = float(l) / m * theta[ix]
+        theta_p.append(big_delta[-1] / m + regularization_term)
 
     return theta_p
 

@@ -48,7 +48,7 @@ def test_zero_hidden_layer():
             assert 1 > col > -1
             avg += col/8
 
-    assert 0.5 > avg > -0.5
+    assert 1 > avg > -1
 
 
 def test_no_layers():
@@ -78,3 +78,6 @@ def test_one_layer():
 
     return False
 
+
+if __name__ == "__main__":
+    test_zero_hidden_layer()

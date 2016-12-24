@@ -70,7 +70,7 @@ if __name__ == "__main__":
     l = [4, 3]
     r = np.matrix(((1, 0, 0), (0, 1, 0), (0, 0, 1)))
     s = SimpleMachine(t, r, l)
-    s.train(100)
+    s.train(10000)
 
 '''
             # we need an error matrix for each layer
