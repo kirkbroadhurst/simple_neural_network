@@ -1,3 +1,3 @@
 import lib
-import tests
+import test
 import simple_machine
