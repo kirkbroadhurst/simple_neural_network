@@ -4,7 +4,7 @@ from data import load_csv
 
 def test_cost():
     """
-    Test using some known data, borrowed from Andrew Ng's Machine Learning Coursera class
+    Test using some known data
     :return:
     """
     y = load_csv('data/y.csv')
@@ -17,7 +17,7 @@ def test_cost():
 
 def test_cost_regularized():
     """
-    Test using some known data, borrowed from Andrew Ng's Machine Learning Coursera class
+    Test using some known data
     :return:
     """
     y = load_csv('data/y.csv')
