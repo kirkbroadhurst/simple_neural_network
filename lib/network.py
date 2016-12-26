@@ -1,6 +1,9 @@
 import numpy as np
 
 
+epsilon = 0.000000001
+
+
 def build_synapses(layers):
     """
     Construct synapses to forward propagate between layers.
@@ -129,6 +132,8 @@ def cost(estimated, y, thetas=[], l=0):
     # the reverse applies for y = 0; we want 'high cost' when y = 0 and estimation -> 1; so use log(1 - est) -> inf.
     # and multiply by 1 - y, i.e. 1 when y == 0
 
+    estimated[estimated >= 1] = 1 - epsilon
+    estimated[estimated <= 0] = epsilon
     gap = np.multiply(-y, np.log(estimated)) - np.multiply(1-y, np.log(1-estimated))
     j = 1.0 / m * np.sum(gap)
 
@@ -186,3 +191,18 @@ def theta_prime(a, z, theta, y, l = 0):
 
     return theta_p
 
+
+def softmax(z_):
+    """
+    Softmax is a normalized expontential function; i.e. exp(z_n) / sum(exp(z_k)) for all k.
+    Gives the relative likelihood / confidence of a prediction.
+    :param z_: Matrix of predictions
+    :return:
+    """
+
+    # construct a k * 1 matrix;
+    # to 'sum' the values for each row we simply multiply z_ * o (sum/collapse) * o.T (project)
+    features = z_.shape[1]
+    o = np.ones((features, 1))
+
+    return np.exp(z_) / (np.exp(z_) * o * o.T)
