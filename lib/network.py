@@ -171,7 +171,8 @@ def theta_prime(a, z, theta, y, l = 0):
         z_ = z[i]
 
         # compute the d value for this layer
-        new_value = np.multiply((d_ * t_[:, 1:]), g_prime(z_))
+        # transpose the theta term as we are 'reversing' the operation.
+        new_value = np.multiply((d_ * t_.T[:, 1:]), g_prime(z_))
         d.insert(0, new_value)
 
     big_delta = []
@@ -179,7 +180,7 @@ def theta_prime(a, z, theta, y, l = 0):
     # compute big delta value & theta_prime values
     for (ix, d_) in enumerate(d):
         # the 'first' d value is d2; multiply it by the first a value a1 - and so on
-        big_delta.append(d_.T * a[ix])
+        big_delta.append(a[ix].T * d_)
         regularization_term = float(l) / m * theta[ix]
         theta_p.append(big_delta[-1] / m + regularization_term)
 

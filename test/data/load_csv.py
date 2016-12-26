@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+import os
 
 
 def load_csv(file_name):
@@ -8,7 +9,7 @@ def load_csv(file_name):
     :param file_name: file name
     :return:
     """
-    with open(file_name, 'r') as f:
+    with open(os.path.dirname(__file__) + '/' + file_name, 'r') as f:
         data_iter = csv.reader(f, delimiter=',')
         data = [data for data in data_iter]
     matrix = np.matrix(data, dtype=float)

@@ -59,36 +59,33 @@ class SimpleMachine(object):
             gradients = theta_prime(a_, z_, self.theta, y)
 
             for (ix, g) in enumerate(gradients):
-                self.theta[ix] -= self.l * g.T
+                self.theta[ix] -= self.l * g
 
         (a_final, z_final) = forward_propagate(self.training_data, self.theta)
         print 'cost', cost(a_final[-1], self.Y)
 
+    pass
 
-if __name__ == "__main__":
-    t = np.matrix(((1.0, 0, 0, 0.99), (0, 0.8, 0, 0.95), (0, 0, 0.9, 0.9)))
+
+def mnist():
+    from lib.mnist import read
+    labels, images = read('training', path='data')
+    label_values = np.unique(np.array(labels))
+    result = (labels == label_values).astype(float)
+    s = SimpleMachine(images, result, [784, 10])
+    s.train(10)
+
+
+def simplest():
+    t = np.matrix(((1.0, 0, 0, 0.99), (0, 0.8, 0, 0.95), (0, 0, 0.9, 0.9),
+                   (1.0, 0, 0, 0.0), (0, 0.8, 0, 0.0), (0, 0, 0.9, 0.0)))
     l = [4, 3]
-    r = np.matrix(((1, 0, 0), (0, 1, 0), (0, 0, 1)))
+    r = np.matrix(((1, 0, 0), (0, 1, 0), (0, 0, 1),
+                   (1, 0, 0), (0, 1, 0), (0, 0, 1)))
     s = SimpleMachine(t, r, l)
     s.train(10000)
 
-'''
-            # we need an error matrix for each layer
-            errors = [None] * len(g)
 
-            # set the last error value to the actual values minus the last layer
-            errors[-1] = y - g[-1]
-
-            # reverse iterate through layers, adjusting synapse according to error
-            for th in range(len(self.theta) - 1, -1, -1):
-                error = delta(self.theta[th], errors[th+1], g[th])
-                self.theta[th] -= error
-                errors[th] = error
-
-            big_delta = sum([(a(g[e])*errors[e])[0, 0] for e in range(len(errors) - 1)])
-            print big_delta
-
-            d0 = 1.0 / self.m * big_delta
-            d = [np.matrix(1.0 / self.m * (big_delta + (self.l * th))) for th in self.theta]
-            self.theta = [th + d[ix] for ix, th in enumerate(self.theta)]
-'''
+if __name__ == "__main__":
+    #simplest()
+    mnist()
