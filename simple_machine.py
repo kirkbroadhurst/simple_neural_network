@@ -14,10 +14,10 @@ class SimpleMachine(object):
         self.training_data = training_data        
         self.Y = result
         self.layers = layers
-        if theta:
-            self.theta = theta
-        else:
+        if theta == []:
             self.theta = build_synapses(layers)
+        else:
+            self.theta = theta
         self.l = 0.01
 
     @property
@@ -34,11 +34,12 @@ class SimpleMachine(object):
 
     def score(self, data):
         """
-        Score the input data against the synapses / machine
-        :param data:
-        :return:
+        Score / predict the input data using the machine
+        :param data: Data set to predict (obviously same shape as training data)
+        :return: Predictions in the same shape as 'result' / labels
         """
-        return forward_propagate(data, self.theta)[-1]
+        _, z_0 = forward_propagate(data, self.theta)
+        return softmax(z_0[-1])
 
     def train(self, iterations=10000):
         """
@@ -90,12 +91,31 @@ def mnist():
     result = (labels == label_values).astype(float)
 
     try:
-        c = np.load('model_coefficients.dat')
+        c = np.load('model_coefficients.dat.npy')
         s = SimpleMachine(image_values, result, [784, 10], c)
     except IOError:
         s = SimpleMachine(image_values, result, [784, 10])
-    c = s.train(100000)
+    c = s.train(50000)
     np.save('model_coefficients.dat', c)
+
+
+def mnist_predict():
+    from lib.mnist import read
+    labels, images = read('training', path='data')
+
+    # normalize the pixel values; avoid overflow
+    image_values = (images-128.0)/128.0
+    label_values = np.unique(np.array(labels))
+    result = (labels == label_values)
+
+    c = np.load('model_coefficients.dat.npy')
+    s = SimpleMachine(image_values, result, [784, 10], c)
+    predicted = s.score(image_values)
+    m = np.amax(predicted, 1)
+    actual_predicted = ((m * np.ones((1, 10))) == predicted)
+
+    true_positives = np.sum(actual_predicted[result])
+    print true_positives, labels.shape[0], 100 * true_positives/labels.shape[0]
 
 
 def simplest():
@@ -109,4 +129,5 @@ def simplest():
 
 
 if __name__ == "__main__":
-    mnist()
+    #mnist()
+    mnist_predict()
