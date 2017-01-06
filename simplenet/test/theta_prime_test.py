@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from simplenet.lib.network import theta_prime, g_prime
 from data import load_csv
 
@@ -11,11 +12,12 @@ def test_theta_prime():
     z2 = load_csv('z2.csv')
     z3 = load_csv('z3.csv')
 
-    theta1 = load_csv('theta1.csv')
-    theta2 = load_csv('theta2.csv')
+    # these are transposed for some reason.
+    theta1 = load_csv('theta1.csv').T
+    theta2 = load_csv('theta2.csv').T
 
-    theta1_grad = load_csv('theta1_grad.csv')
-    theta2_grad = load_csv('theta2_grad.csv')
+    theta1_grad = load_csv('theta1_grad.csv').T
+    theta2_grad = load_csv('theta2_grad.csv').T
 
     y = load_csv('y.csv')
 
@@ -32,11 +34,12 @@ def test_theta_prime_regularization():
     z2 = load_csv('z2.csv')
     z3 = load_csv('z3.csv')
 
-    theta1 = load_csv('theta1.csv')
-    theta2 = load_csv('theta2.csv')
+    # these are transposed for some reason.
+    theta1 = load_csv('theta1.csv').T
+    theta2 = load_csv('theta2.csv').T
 
-    theta1_grad_reg = load_csv('theta1_grad_reg.csv')
-    theta2_grad_reg = load_csv('theta2_grad_reg.csv')
+    theta1_grad_reg = load_csv('theta1_grad_reg.csv').T
+    theta2_grad_reg = load_csv('theta2_grad_reg.csv').T
 
     y = load_csv('y.csv')
 
@@ -53,8 +56,9 @@ def test_generic_vs_static():
     z2 = load_csv('z2.csv')
     z3 = load_csv('z3.csv')
 
-    theta1 = load_csv('theta1.csv')
-    theta2 = load_csv('theta2.csv')
+    # these are transposed for some reason.
+    theta1 = load_csv('theta1.csv').T
+    theta2 = load_csv('theta2.csv').T
 
     y = load_csv('y.csv')
 
@@ -89,10 +93,10 @@ def fixed_theta_prime(a, z, theta, y):
     z3 = z[1]
 
     d3 = a3 - y
-    d2 = np.multiply((d3 * theta2[:, 1:]), g_prime(z2))
+    d2 = np.multiply((d3 * theta2.T[:, 1:]), g_prime(z2))
 
-    delta1 = d2.T*a1
-    delta2 = d3.T*a2
+    delta1 = a1.T*d2
+    delta2 = a2.T*d3
 
     theta1_prime = delta1 / m
     theta2_prime = delta2 / m
