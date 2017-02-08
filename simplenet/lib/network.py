@@ -84,6 +84,7 @@ def g(x):
     :param x: Scalar, matrix, array etc of real values
     :return: The value of the sigmoid function at point(s) x
     """
+    x[x < -100] = -100
     return 1/(1+np.exp(-x))
 
 
@@ -205,4 +206,6 @@ def softmax(z_):
     features = z_.shape[1]
     o = np.ones((features, 1))
 
+    # put a ceiling on these values; taking exp(big_number) causes overflow
+    z_[z_ > 100] = 100
     return np.exp(z_) / (np.exp(z_) * o * o.T)

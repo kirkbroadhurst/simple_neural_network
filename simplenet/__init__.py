@@ -1,2 +1,2 @@
 import lib
-import simple_machine
+from simple_machine import SimpleMachine
