@@ -81,7 +81,7 @@ def z(a_, theta):
 def g(x):
     """
     Get the value of the sigmoid function at x
-    :param x: Scalar, matrix, array etc of real values
+    :param x: Matrix or array of real values
     :return: The value of the sigmoid function at point(s) x
     """
     x[x < -100] = -100
