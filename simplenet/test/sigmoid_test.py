@@ -1,4 +1,4 @@
-from lib.network import g
+from simplenet.lib.network import g
 import numpy as np
 
 
