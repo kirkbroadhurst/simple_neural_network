@@ -62,6 +62,7 @@ class SimpleMachine(object):
 
             # some hacks to monitor progress
             # uncomment this to see progress
+            '''
             if i % 1000 == 0 and not quiet:
                 (a_0, z_0) = forward_propagate(self.training_data, self.theta)
                 print 'cost', cost(a_0[-1], self.Y)
@@ -70,6 +71,7 @@ class SimpleMachine(object):
                 est = s.tolist()[0].index(m)
                 actual = int((values * self.Y[i].T)[0, 0])
                 print est, '(actual = {0})'.format(actual), "- {0:.0f}% confidence".format(100 * s[0, est])
+            '''
 
             gradients = theta_prime(a_, z_, self.theta, y)
 
