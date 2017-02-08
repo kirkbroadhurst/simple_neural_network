@@ -40,7 +40,6 @@ def read(data_set="training", path="."):
 
     with open(name_img, 'rb') as image_file:
         magic, num, rows, cols = struct.unpack(">IIII", image_file.read(16))
-        # img = np.fromfile(image_file, dtype=np.uint8).reshape(len(lbl), rows, cols)
         images = np.matrix(np.fromfile(image_file, dtype=np.uint8).reshape(labels.shape[0], rows*cols))
 
     return labels, images
