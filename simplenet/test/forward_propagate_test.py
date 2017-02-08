@@ -1,5 +1,5 @@
 import numpy as np
-from lib.network import forward_propagate
+from simplenet.lib.network import forward_propagate
 
 
 def test_single_synapse():

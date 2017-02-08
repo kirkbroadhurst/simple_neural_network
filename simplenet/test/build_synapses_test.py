@@ -1,4 +1,4 @@
-from lib.network import build_synapses
+from simplenet.lib.network import build_synapses
 
 
 def assert_layer_result(layers, shape, length):
